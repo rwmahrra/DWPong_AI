@@ -6,7 +6,7 @@ import imageio
 import csv
 import matplotlib.pyplot as plt
 
-from exhibit.shared.config import Config
+from config import Config
 
 """
 Various utility helper methods to consolidate reusable code

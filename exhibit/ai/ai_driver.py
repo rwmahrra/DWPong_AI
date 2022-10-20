@@ -1,13 +1,13 @@
 import sys
-from ai.model import PGAgent
-from shared.config import Config
+from model import PGAgent
+from config import Config
 # from game.game_subscriber import GameSubscriber
 import time
-from ai.ai_subscriber import AISubscriber
+from ai_subscriber import AISubscriber
 import numpy as np
 import cv2
 import threading
-from shared.utils import Timer
+from utils import Timer
 
 from queue import Queue
 

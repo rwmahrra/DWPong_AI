@@ -4,8 +4,8 @@ import paho.mqtt.client as mqtt
 import numpy as np
 import json
 
-from exhibit.shared import utils
-from exhibit.shared.config import Config
+import utils
+from config import Config
 import cv2
 import math
 

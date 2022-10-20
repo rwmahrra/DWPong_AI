@@ -4,8 +4,8 @@ warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 
 import os
 from exhibit.train import simulator
-from exhibit.shared.utils import save_video, plot_loss, plot_score, plot_duration
-from exhibit.shared.config import Config
+from exhibit.ai.utils import save_video, plot_loss, plot_score, plot_duration
+from exhibit.ai.config import Config
 from exhibit.ai.model import PGAgent
 from visualizer import get_weight_image
 import numpy as np
