@@ -4,8 +4,9 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.optimizers import Adam
 
-from config import Config
-from utils import write
+from exhibit.shared.config import Config
+from exhibit.shared.utils import write
+
 import numpy as np
 
 

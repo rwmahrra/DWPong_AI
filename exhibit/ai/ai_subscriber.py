@@ -4,8 +4,8 @@ import paho.mqtt.client as mqtt
 import numpy as np
 import json
 
-import utils
-from config import Config
+from exhibit.shared import utils
+from exhibit.shared.config import Config
 import cv2
 import math
 
@@ -25,24 +25,34 @@ class AISubscriber:
         client.subscribe("game/level")
         client.subscribe("game/frame")
 
+        # NICK
+        client.subscribe("camera/gamestate")
+
+    def convert_rgb(self, x):
+        if int(x) == 0:
+            return [140, 60, 0]
+        else:
+            return [255, 255, 255]
+
     def on_message(self, client, userdata, msg):
         topic = msg.topic
-        payload = json.loads(msg.payload)
-        if topic == "puck/position":
-            self.puck_x = payload["x"]
-            self.puck_y = payload["y"]
-        if topic == "paddle1/position":
-            self.bottom_paddle_x = payload["position"]
-        if topic == "paddle2/position":
-            self.top_paddle_x = payload["position"]
-        if topic == "game/level":
-            self.game_level = payload["level"]
+
+        # if topic == "game/level":
+        #     self.game_level = payload["level"]
+
+        # Unity Implementation below
+        if topic == "camera/gamestate":
+            self.trailing_frame = self.latest_frame
+            self.latest_frame = np.array([self.convert_rgb(x) for x in msg.payload.decode()], dtype=np.float32).reshape(160, 192, 3)
+            self.latest_frame = utils.preprocess(self.latest_frame)
+
+
         if topic == "game/frame":
-            self.frame = payload["frame"]
+            self.frame = int(msg.payload.decode())
             if Config.instance().NETWORK_TIMESTAMPS:
                 print(f'{time.time_ns() // 1_000_000} F{self.frame} RECV GM->AI')
-            self.trailing_frame = self.latest_frame
-            self.latest_frame = self.render_latest_preprocessed()
+
+
 
     def draw_rect(self, screen, x, y, w, h, color):
         """
@@ -70,7 +80,9 @@ class AISubscriber:
         """
         if topic == 'paddle1/frame' and Config.instance().NETWORK_TIMESTAMPS:
             print(f'{time.time_ns() // 1_000_000} F{message["frame"]} SEND AI->GM')
-        p = json.dumps(message)
+        #p = json.dumps(message)
+        p = message
+        print("publishing... ", topic, message)
         self.client.publish(topic, payload=p, qos=qos)
 
     def render_latest(self, bottom=False):
@@ -112,6 +124,7 @@ class AISubscriber:
         """
         if self.trailing_frame is None:
             return self.latest_frame
+        print("render_latest_diff: (latest, trailing)", self.latest_frame.shape, self.trailing_frame.shape)
         return self.latest_frame - self.trailing_frame
 
     def ready(self):
